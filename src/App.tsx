@@ -46,9 +46,7 @@ const startDateSeed = parseInt(process.env.REACT_APP_CANDY_START_DATE!, 10);
 const txTimeout = 30000; // milliseconds (confirm this works for your project)
 
 const theme = createTheme({
-  palette: {
-    primary: teal,
-  }
+
 });
 
 const App = () => {

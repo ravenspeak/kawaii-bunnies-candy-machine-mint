@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import styled from "styled-components";
 import Countdown from "react-countdown";
 import {
   Button,
@@ -13,13 +12,16 @@ import {
   Typography,
   Menu,
   Container,
-  Avatar,
-  Tooltip,
   MenuItem,
-  Grid
+  Grid,
+  Modal
 } from "@mui/material";
-
 import MenuIcon from '@mui/icons-material/Menu';
+import About from "./sections/About";
+import Roadmap from "./sections/Roadmap";
+import Faq from "./sections/Faq";
+import Team from "./sections/Team";
+
 import * as anchor from "@project-serum/anchor";
 
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
@@ -34,10 +36,6 @@ import {
   mintOneToken,
   shortenAddress,
 } from "./candy-machine";
-
-const CounterText = styled.span``; // add your styles here
-
-const MintContainer = styled.div``; // add your styles here
 export interface HomeProps {
   candyMachineId: anchor.web3.PublicKey;
   config: anchor.web3.PublicKey;
@@ -46,6 +44,17 @@ export interface HomeProps {
   treasury: anchor.web3.PublicKey;
   txTimeout: number;
 }
+
+const style = {
+  position: 'absolute' as 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'rgba(212, 135, 223, 0.637)',
+  boxShadow: 24,
+  p: 4,
+};
 
 const Home = (props: HomeProps) => {
   const [balance, setBalance] = useState<number>();
@@ -179,22 +188,23 @@ const Home = (props: HomeProps) => {
   return (
     <Container maxWidth='xl'>
       <ResponsiveAppBar />
+      <About />
+      <Container maxWidth='lg'>
+        <Grid container>
+          <Grid item xs={12} md={6}>
+            {wallet && (
+              <p>Wallet: {shortenAddress(wallet.publicKey.toBase58() || "")}</p>
+            )}
 
-      <Grid container>
-        <Grid item xs={12} md={6}>
-          {wallet && (
-            <p>Wallet: {shortenAddress(wallet.publicKey.toBase58() || "")}</p>
-          )}
+            {wallet && <p>Balance: {(balance || 0).toLocaleString()} SOL</p>}
+          </Grid>
+          <Grid item xs={12} md={6}>
+            {wallet && <p>Bunnies Available: {itemsRemaining}</p>}
 
-          {wallet && <p>Balance: {(balance || 0).toLocaleString()} SOL</p>}
-        </Grid>
-        <Grid item xs={12} md={6}>
-          {wallet && <p>Bunnies Available: {itemsRemaining}</p>}
+            {wallet && <p>Bunnies Minted: {itemsRedeemed} / {itemsAvailable}</p>}
+          </Grid>
+          <Grid item xs={12}>
 
-          {wallet && <p>Bunnies Minted: {itemsRedeemed} / {itemsAvailable}</p>}
-        </Grid>
-        <Grid item xs={12}>
-          <MintContainer>
             {!wallet ? (
               <WalletDialogButton>Connect Wallet</WalletDialogButton>
             ) : (
@@ -207,7 +217,7 @@ const Home = (props: HomeProps) => {
                   "SOLD OUT"
                 ) : isActive ? (
                   isMinting ? (
-                    <CircularProgress />
+                    <CircularProgress size={20} />
                   ) : (
                     "ADOPT A BUNNY"
                   )
@@ -221,10 +231,13 @@ const Home = (props: HomeProps) => {
                 )}
               </Button>
             )}
-          </MintContainer>
-        </Grid>
-      </Grid>
 
+          </Grid>
+        </Grid>
+      </Container>
+      <Roadmap />
+      <Faq />
+      <Team />
 
       <Snackbar
         open={alertState.open}
@@ -238,7 +251,23 @@ const Home = (props: HomeProps) => {
           {alertState.message}
         </Alert>
       </Snackbar>
-    </Container>
+
+      <Modal
+        open={isMinting}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Text in a modal
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            Preparing your bunny.
+          </Typography>
+        </Box>
+      </Modal>
+
+    </Container >
   );
 };
 
@@ -250,15 +279,15 @@ interface AlertState {
 
 const renderCounter = ({ days, hours, minutes, seconds, completed }: any) => {
   return (
-    <CounterText>
+    <Container>
       {hours + (days || 0) * 24} hours, {minutes} minutes, {seconds} seconds
-    </CounterText>
+    </Container>
   );
 };
 
 export default Home;
 
-const pages = ['About', 'Mint', 'Roadmap', 'FAQ', 'Team'];
+const pages = ['Home', 'Mint', 'Roadmap', 'FAQ', 'Team'];
 
 const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -329,6 +358,11 @@ const ResponsiveAppBar = () => {
             LOGO
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+
+          </Box>
+
+          <Box sx={{ flexGrow: 0, display: { xs: 'none', md: 'flex' } }}>
+
             {pages.map((page) => (
               <Button
                 key={page}
@@ -338,14 +372,6 @@ const ResponsiveAppBar = () => {
                 {page}
               </Button>
             ))}
-          </Box>
-
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton>
-            </Tooltip>
 
           </Box>
         </Toolbar>

@@ -9,6 +9,7 @@
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.60",
     "@mui/icons-material": "^5.2.1",
+    "@mui/lab": "^5.0.0-alpha.59",
     "@mui/material": "^5.2.3",
     "@project-serum/anchor": "^0.14.0",
     "@solana/spl-token": "^0.1.8",
