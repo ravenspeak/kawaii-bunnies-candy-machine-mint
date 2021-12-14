@@ -15,7 +15,8 @@ import {
   Container,
   Avatar,
   Tooltip,
-  MenuItem
+  MenuItem,
+  Grid
 } from "@mui/material";
 
 import MenuIcon from '@mui/icons-material/Menu';
@@ -34,14 +35,9 @@ import {
   shortenAddress,
 } from "./candy-machine";
 
-const ConnectButton = styled(WalletDialogButton)``;
-
 const CounterText = styled.span``; // add your styles here
 
 const MintContainer = styled.div``; // add your styles here
-
-const MintButton = styled(Button)``; // add your styles here
-
 export interface HomeProps {
   candyMachineId: anchor.web3.PublicKey;
   config: anchor.web3.PublicKey;
@@ -183,42 +179,52 @@ const Home = (props: HomeProps) => {
   return (
     <Container maxWidth='xl'>
       <ResponsiveAppBar />
-      {wallet && (
-        <p>Wallet: {shortenAddress(wallet.publicKey.toBase58() || "")}</p>
-      )}
 
-      {wallet && <p>Balance: {(balance || 0).toLocaleString()} SOL</p>}
+      <Grid container>
+        <Grid item xs={12} md={6}>
+          {wallet && (
+            <p>Wallet: {shortenAddress(wallet.publicKey.toBase58() || "")}</p>
+          )}
 
-      {wallet && <p>Bunnies: {itemsRedeemed} / {itemsAvailable}</p>}
+          {wallet && <p>Balance: {(balance || 0).toLocaleString()} SOL</p>}
+        </Grid>
+        <Grid item xs={12} md={6}>
+          {wallet && <p>Bunnies Available: {itemsRemaining}</p>}
 
-      <MintContainer>
-        {!wallet ? (
-          <ConnectButton>Connect Wallet</ConnectButton>
-        ) : (
-          <MintButton
-            disabled={isSoldOut || isMinting || !isActive}
-            onClick={onMint}
-            variant="contained"
-          >
-            {isSoldOut ? (
-              "SOLD OUT"
-            ) : isActive ? (
-              isMinting ? (
-                <CircularProgress />
-              ) : (
-                "MINT"
-              )
+          {wallet && <p>Bunnies Minted: {itemsRedeemed} / {itemsAvailable}</p>}
+        </Grid>
+        <Grid item xs={12}>
+          <MintContainer>
+            {!wallet ? (
+              <WalletDialogButton>Connect Wallet</WalletDialogButton>
             ) : (
-              <Countdown
-                date={startDate}
-                onMount={({ completed }) => completed && setIsActive(true)}
-                onComplete={() => setIsActive(true)}
-                renderer={renderCounter}
-              />
+              <Button
+                disabled={isSoldOut || isMinting || !isActive}
+                onClick={onMint}
+                variant="contained"
+              >
+                {isSoldOut ? (
+                  "SOLD OUT"
+                ) : isActive ? (
+                  isMinting ? (
+                    <CircularProgress />
+                  ) : (
+                    "ADOPT A BUNNY"
+                  )
+                ) : (
+                  <Countdown
+                    date={startDate}
+                    onMount={({ completed }) => completed && setIsActive(true)}
+                    onComplete={() => setIsActive(true)}
+                    renderer={renderCounter}
+                  />
+                )}
+              </Button>
             )}
-          </MintButton>
-        )}
-      </MintContainer>
+          </MintContainer>
+        </Grid>
+      </Grid>
+
 
       <Snackbar
         open={alertState.open}

@@ -22,7 +22,7 @@ import {
 import { WalletDialogProvider } from "@solana/wallet-adapter-material-ui";
 import { ThemeProvider } from "@mui/material";
 import { createTheme } from '@mui/material/styles';
-import blue from '@mui/material/colors/blue';
+import teal from '@mui/material/colors/teal';
 
 const treasury = new anchor.web3.PublicKey(
   process.env.REACT_APP_TREASURY_ADDRESS!
@@ -47,7 +47,7 @@ const txTimeout = 30000; // milliseconds (confirm this works for your project)
 
 const theme = createTheme({
   palette: {
-    primary: blue,
+    primary: teal,
   }
 });
 
